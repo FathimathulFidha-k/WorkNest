@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Job</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Post Job</h1>
+
+        <input type="text" id="title" placeholder="Job Title">
+        <input type="text" id="skill" placeholder="Required Skill">
+        <input type="text" id="date" placeholder="Job Date">
+        <input type="text" id="location" placeholder="Location">
+        <input type="number" id="salary" placeholder="Salary">
+
+        <select id="jobType" onchange="toggleSkill()">
+            <option value="Skill">Skill-Based</option>
+            <option value="General">General (No Skill Required)</option>
+        </select>
+
+        <button onclick="postJob()">Post Job</button>
+        <button onclick="location.href='index.html'">Back</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

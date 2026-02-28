@@ -1,0 +1,340 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f") no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+
+
+/* Page Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Card */.card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    width: 420px;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: slideUp 0.8s ease;
+    color: white;
+}
+   
+
+/* Slide Up */
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+h1 {
+    margin: 0;
+    font-size: 28px;
+    color:white;
+}
+
+.subtitle {
+    color: #f1f1f1;
+    margin-bottom: 25px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 8px rgba(25,118,210,0.3);
+    outline: none;
+}
+
+
+.job-card {
+    background: #ffffff;
+    padding: 15px;
+    margin: 12px 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    text-align: left;
+    animation: fadeInCard 0.6s ease forwards;
+}
+
+@keyframes fadeInCard {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.job-card {
+    color: black;
+}
+/* Remove arrows from number input */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+/* NAVBAR */
+/* ===== NAVBAR ===== */
+
+/* ===== NAVBAR FIXED STYLE ===== */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 15px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.85); /* darker background */
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+}
+
+/* Website name */
+.navbar h2 {
+    color: #00c6ff;
+    margin: 0;
+    font-weight: bold;
+}
+
+/* Navigation links */
+/* ===== SIMPLE NAVBAR ===== */
+.navbar {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    background: transparent;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-left: 30px;
+    font-size: 18px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    color: #00c6ff;
+}
+/* HERO SECTION */
+.hero {
+    text-align: center;
+    margin-top: 120px;
+    color: white;
+}
+
+.hero h1 {
+    font-size: 40px;
+}
+
+.hero button {
+    margin-top: 20px;
+    padding: 12px 25px;
+}
+.status {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status.Approved {
+    background: #4CAF50;
+    color: white;
+}
+
+.status.Rejected {
+    background: #f44336;
+    color: white;
+}
+
+.status.Pending {
+    background: #ff9800;
+    color: white;
+}
+.job-card:hover {
+    transform: scale(1.03);
+    transition: 0.3s;
+}
+/* SPLASH SCREEN */
+/* ===== PREMIUM SPLASH SCREEN ===== */
+
+#splash {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: slideUpFade 3.5s forwards;
+    animation-delay: 3s;
+}
+
+/* Logo styling */
+.logo {
+    font-size: 60px;
+    font-weight: bold;
+    letter-spacing: 5px;
+}
+
+/* Letter animation */
+.logo span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: letterRise 0.6s forwards;
+}
+
+/* Delay each letter */
+.logo span:nth-child(1) { animation-delay: 0.1s; }
+.logo span:nth-child(2) { animation-delay: 0.2s; }
+.logo span:nth-child(3) { animation-delay: 0.3s; }
+.logo span:nth-child(4) { animation-delay: 0.4s; }
+.logo span:nth-child(5) { animation-delay: 0.5s; }
+.logo span:nth-child(6) { animation-delay: 0.6s; }
+.logo span:nth-child(7) { animation-delay: 0.7s; }
+.logo span:nth-child(8) { animation-delay: 0.8s; }
+
+/* Glow gradient text */
+.logo {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Tagline */
+.tagline {
+    color: white;
+    margin-top: 15px;
+    opacity: 0;
+    animation: fadeInTag 1s forwards;
+    animation-delay: 1.2s;
+}
+
+/* Animations */
+@keyframes letterRise {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInTag {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUpFade {
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+.hero {
+    margin-top: 120px;
+}
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+/* HERO SECTION CENTER */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    margin-bottom: 40px;
+    font-size: 18px;
+}
+
+/* BOX CONTAINER */
+.action-boxes {
+    display: flex;
+    gap: 30px;
+}
+
+/* INDIVIDUAL BOX */
+.box {
+    width: 180px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.box h3 {
+    color: white;
+}
+
+.box:hover {
+    transform: scale(1.08);
+    background: rgba(0, 198, 255, 0.3);
+}
