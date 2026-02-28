@@ -1,5 +1,4 @@
 
-````markdown
 <p align="center">
   <img src="./img.png" alt="WorkNest Banner" width="100%">
 </p>
