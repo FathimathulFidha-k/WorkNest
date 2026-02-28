@@ -126,69 +126,46 @@ function logout() {
 // ---------------- REGISTER STUDENT PROFILE ----------------
 
 function registerStudent() {
-    let selectedSkill = document.getElementById('skills') ? document.getElementById('skills').value : '';
+
+    let selectedSkill = document.getElementById("skills").value;
 
     let student = {
-        name: document.getElementById('name') ? document.getElementById('name').value : '',
-        skills: selectedSkill === 'General' ? '' : selectedSkill,
-        isGeneral: selectedSkill === 'General',
-        date: document.getElementById('date') ? document.getElementById('date').value : '',
-        location: document.getElementById('location') ? document.getElementById('location').value : ''
+        name: document.getElementById("name").value,
+        skills: selectedSkill === "General" ? "" : selectedSkill,
+        isGeneral: selectedSkill === "General",
+        date: document.getElementById("date").value,
+        location: document.getElementById("location").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value
     };
 
-    // save locally
-    localStorage.setItem('student', JSON.stringify(student));
-
-    // save to Firestore (if available) using current user's uid or email as key
-    if (firebaseReady) {
-        const current = fbAuth.currentUser;
-        const key = current ? (current.uid || current.email) : (localStorage.getItem('loggedInStudent') || student.name);
-        try {
-            fbDB.collection('students').doc(String(key)).set(student, { merge: true });
-            console.log('Student profile saved to Firestore for', key);
-        } catch (err) {
-            console.error('Failed to save student to Firestore', err);
-        }
-    }
-
-    alert('Profile Saved Successfully!');
+    localStorage.setItem("student", JSON.stringify(student));
+    alert("Profile Saved Successfully!");
 }
 
 // ---------------- POST JOB ----------------
 
 function postJob() {
-    const job = {
-        title: document.getElementById('title') ? document.getElementById('title').value : '',
-        skill: document.getElementById('skill') ? document.getElementById('skill').value : '',
-        date: document.getElementById('date') ? document.getElementById('date').value : '',
-        location: document.getElementById('location') ? document.getElementById('location').value : '',
-        salary: document.getElementById('salary') ? document.getElementById('salary').value : '',
-        type: document.getElementById('jobType') ? document.getElementById('jobType').value : '',
-        status: 'Pending',
-        createdAt: new Date().toISOString()
+
+    let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+    let job = {
+        title: document.getElementById("title").value,
+        skill: document.getElementById("skill").value,
+        date: document.getElementById("date").value,
+        location: document.getElementById("location").value,
+        salary: document.getElementById("salary").value,
+        type: document.getElementById("jobType").value,
+        contactPerson: document.getElementById("contactPerson").value,
+        contactPhone: document.getElementById("contactPhone").value,
+        status: "Pending"
     };
 
-    if (firebaseReady) {
-        fbDB.collection('jobs').add(job).then(() => {
-            alert('Job Posted Successfully!');
-        }).catch(err => {
-            console.error('Failed to post job to Firestore', err);
-            // fallback to localStorage
-            const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
-            jobs.push(job);
-            localStorage.setItem('jobs', JSON.stringify(jobs));
-            alert('Job Posted locally (Firestore error)');
-        });
-        return;
-    }
-
-    // fallback
-    let jobs = JSON.parse(localStorage.getItem('jobs')) || [];
     jobs.push(job);
-    localStorage.setItem('jobs', JSON.stringify(jobs));
-    alert('Job Posted Successfully!');
-}
+    localStorage.setItem("jobs", JSON.stringify(jobs));
 
+    alert("Job Posted Successfully!");
+}
 // Disable skill field for General job
 function toggleSkill() {
     let typeEl = document.getElementById('jobType');
@@ -286,43 +263,25 @@ function applyJob(idOrTitle, titleOpt) {
 
 // ---------------- LOAD STUDENT APPLICATIONS ----------------
 
-function loadApplications() {
-    const list = document.getElementById('applicationList');
-    if (!list) return;
-    list.innerHTML = '';
+function loadAdminApplications() {
 
-    const currentUser = localStorage.getItem('loggedInStudent');
+    let applications = JSON.parse(localStorage.getItem("applications")) || [];
+    let student = JSON.parse(localStorage.getItem("student"));
+    let container = document.getElementById("adminApplicationList");
 
-    if (firebaseReady) {
-        fbDB.collection('applications').get().then(snapshot => {
-            snapshot.forEach(doc => {
-                const app = doc.data();
-                if (app.student === currentUser) {
-                    list.innerHTML += `
-                                <div class="job-card">
-                                        <h3>${app.title}</h3>
-                                        <p>Status: Applied</p>
-                                </div>
-                        `;
-                }
-            });
-        }).catch(err => console.error('Failed to load applications from Firestore', err));
-        return;
-    }
+    container.innerHTML = "";
 
-    const applications = JSON.parse(localStorage.getItem('applications')) || [];
     applications.forEach(app => {
-        if (app.student === currentUser) {
-            list.innerHTML += `
-                                <div class="job-card">
-                                        <h3>${app.title}</h3>
-                                        <p>Status: Applied</p>
-                                </div>
-                        `;
-        }
+        container.innerHTML += `
+            <div class="job-card">
+                <h3>${app.title}</h3>
+                <p>Applied By: ${app.student}</p>
+                <p>Email: ${student ? student.email : ""}</p>
+                <p>Phone: ${student ? student.phone : ""}</p>
+            </div>
+        `;
     });
 }
-
 // ---------------- ADMIN LOGIN ----------------
 
 function adminLogin() {
@@ -426,6 +385,8 @@ function loadAdminJobs() {
                 <p><b>Type:</b> ${job.type}</p>
                 <p><b>Location:</b> ${job.location}</p>
                 <p><b>Status:</b> ${job.status}</p>
+                <p><b>Contact:</b> ${job.contactPerson}</p>
+<p><b>Phone:</b> ${job.contactPhone}</p>
 
                 ${job.status === 'Pending' ? `
                     <button onclick="verifyJob(${index})">Verify</button>

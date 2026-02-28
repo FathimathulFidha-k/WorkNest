@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>Student Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body onload="checkLogin()">
 
-<div class="container">
-    <div class="card">
-        <h1>Student Dashboard</h1>
+<div class="dashboard-container">
 
-        <button onclick="location.href='register.html'">Complete Profile</button>
-        <button onclick="location.href='jobs.html'">View Available Jobs</button>
-        <button onclick="location.href='applications.html'">My Applications</button>
-        <button onclick="logout()">Logout</button>
+    <div class="dashboard-header">
+        <h1>Student Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
+
+    <div class="dashboard-cards">
+        <div class="dash-card" onclick="location.href='register.html'">
+            <h3>Complete Profile</h3>
+        </div>
+
+        <div class="dash-card" onclick="location.href='jobs.html'">
+            <h3>View Jobs</h3>
+        </div>
+
+        <div class="dash-card" onclick="location.href='applications.html'">
+            <h3>My Applications</h3>
+        </div>
+    </div>
+
 </div>
 
 <script src="script.js"></script>

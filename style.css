@@ -22,7 +22,6 @@ body::before {
     from { opacity: 0; }
     to { opacity: 1; }
 }
-
 .container {
     display: flex;
     justify-content: center;
@@ -30,19 +29,16 @@ body::before {
     min-height: 100vh;
 }
 
-/* Card */.card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+
+   .card {
+    background: rgba(255, 255, 255, 0.95);   /* solid white */
     width: 420px;
     padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     text-align: center;
-    animation: slideUp 0.8s ease;
-    color: white;
+    color: #333;
 }
-   
 
 /* Slide Up */
 @keyframes slideUp {
@@ -56,29 +52,37 @@ body::before {
     }
 }
 
-h1 {
-    margin: 0;
-    font-size: 28px;
-    color:white;
-}
 
+h1 {
+    font-size: 30px;
+    margin-bottom: 25px;
+    background: linear-gradient(90deg, #e1bee7, #ce93d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 .subtitle {
     color: #f1f1f1;
     margin-bottom: 25px;
 }
-
 input, select {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
+    padding: 14px;
+    margin: 14px 0;
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #444;
+    background: rgba(255,255,255,0.05);
+    color: white;
+    font-size: 14px;
     transition: 0.3s;
 }
 
+input::placeholder {
+    color: #bbb;
+}
+
 input:focus, select:focus {
-    border-color: #1976d2;
-    box-shadow: 0 0 8px rgba(25,118,210,0.3);
+    border-color: #9c27b0;
+    box-shadow: 0 0 10px rgba(156,39,176,0.5);
     outline: none;
 }
 
@@ -286,8 +290,14 @@ input[type=number] {
     margin-top: 120px;
 }
 .card {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
+    background: rgba(30, 30, 40, 0.85);
+    backdrop-filter: blur(12px);
+    width: 450px;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    text-align: center;
+    color: white;
 }
 /* HERO SECTION CENTER */
 .hero {
@@ -337,4 +347,122 @@ input[type=number] {
 .box:hover {
     transform: scale(1.08);
     background: rgba(0, 198, 255, 0.3);
+}/* ===== DASHBOARD LAYOUT ===== */
+
+.dashboard-container {
+    padding: 40px;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+    background: linear-gradient(90deg, #e1bee7, #ce93d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 32px;
+}
+
+.logout-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ff4081, #c2185b);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(255,64,129,0.5);
+}
+
+/* DASHBOARD CARDS */
+
+.dashboard-cards {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+
+
+
+}
+.dash-card {
+    flex: 1;
+    min-width: 220px;
+    height: 140px;
+    background: linear-gradient(135deg, #9c27b0, #673ab7);
+    border-radius: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 10px 30px rgba(156,39,176,0.4);
+}
+
+.dash-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(156,39,176,0.7);
+}
+
+/* Section Titles */
+
+.section-title {
+    color: white;
+    margin-top: 40px;
+}
+
+/* Stats Box */
+
+.stats-box {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 20px;
+}
+/* ===== MODERN BUTTON STYLE ===== */
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #9c27b0, #673ab7);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(156,39,176,0.6);
+}
+body::before {
+    background: rgba(0, 0, 0, 0.7);
+}
+/* FIX DROPDOWN OPTIONS */
+
+select {
+    background: rgba(255,255,255,0.05);
+    color: white;
+}
+
+select option {
+    background: #2c2c3c;   /* dark background */
+    color: white;          /* visible text */
 }
