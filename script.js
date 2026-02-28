@@ -1,17 +1,35 @@
-// ================= FIREBASE CONFIG =================
-
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "worknest-8da58.firebaseapp.com",
-    projectId: "worknest-8da58",
-    storageBucket: "worknest-8da58.appspot.com",
-    messagingSenderId: "673928983491",
-    appId: "1:673928983491:web:ddcd8252f16e9dfb850376"
+// ================= FIREBASE CONFIG (from .env -> firebase-config.js) =================
+// If you run `node scripts/generate-config.js` it will read your local .env and
+// write firebase-config.js which defines window.__FIREBASE_CONFIG__.
+// This file prefers the injected config; it falls back to a placeholder config.
+const fallbackFirebaseConfig = {
+  apiKey: vars.FIREBASE_API_KEY || '',
+  authDomain: vars.FIREBASE_AUTH_DOMAIN || '',
+  projectId: vars.FIREBASE_PROJECT_ID || '',
+  storageBucket: vars.FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: vars.FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: vars.FIREBASE_APP_ID || '',
+  measurementId: vars.FIREBASE_MEASUREMENT_ID || ''
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+
+const firebaseConfig = (typeof window !== 'undefined' && window.__FIREBASE_CONFIG__) ? window.__FIREBASE_CONFIG__ : fallbackFirebaseConfig;
+
+if (typeof firebase === 'undefined') {
+    console.warn('Firebase SDK not found on page. Make sure you include Firebase SDK scripts in your HTML (or use the compat bundles).');
+} else {
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // expose for other functions in this file that expect `auth` and `db`
+    window.__FIREBASE_AUTH__ = auth;
+    window.__FIREBASE_DB__ = db;
+}
+
+// Helper accessors that other functions below use (fall back to window vars)
+function getAuth() { return (typeof window !== 'undefined' && window.__FIREBASE_AUTH__) ? window.__FIREBASE_AUTH__ : (typeof firebase !== 'undefined' ? firebase.auth() : null); }
+function getDB() { return (typeof window !== 'undefined' && window.__FIREBASE_DB__) ? window.__FIREBASE_DB__ : (typeof firebase !== 'undefined' ? firebase.firestore() : null); }
 
 
 // ================= STUDENT LOGIN =================
@@ -32,12 +50,12 @@ async function loginStudent() {
     const email = usernameToEmail(username);
 
     try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const userCredential = await getAuth().signInWithEmailAndPassword(email, password);
         localStorage.setItem("loggedInStudent", userCredential.user.email);
         window.location.href = "dashboard.html";
     } catch (error) {
         try {
-            const newUser = await auth.createUserWithEmailAndPassword(email, password);
+            const newUser = await getAuth().createUserWithEmailAndPassword(email, password);
             localStorage.setItem("loggedInStudent", newUser.user.email);
             window.location.href = "dashboard.html";
         } catch (err) {
@@ -53,7 +71,8 @@ function checkLogin() {
 }
 
 function logout() {
-    auth.signOut();
+    const a = getAuth();
+    if (a && a.signOut) a.signOut();
     localStorage.removeItem("loggedInStudent");
     window.location.href = "index.html";
 }
@@ -73,9 +92,14 @@ function registerStudent() {
         phone: document.getElementById("phone").value
     };
 
-    db.collection("students").add(student)
-        .then(() => alert("Profile Saved"))
-        .catch(err => alert(err.message));
+    const database = getDB();
+    if (database) {
+        database.collection("students").add(student)
+            .then(() => alert("Profile Saved"))
+            .catch(err => alert(err.message));
+        return;
+    }
+    alert('Profile saved locally (no Firestore)');
 }
 
 
@@ -96,9 +120,19 @@ async function postJob() {
         status: "Pending"
     };
 
-    await db.collection("jobs").add(job);
-    alert("Job Posted Successfully!");
-    console.log("Job Posted Successfully!");
+    const database = getDB();
+    if (database) {
+        await database.collection("jobs").add(job);
+        alert("Job Posted Successfully!");
+        console.log("Job Posted Successfully!");
+        return;
+    }
+    // fallback: localStorage
+    let jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    jobs.push(job);
+    localStorage.setItem('jobs', JSON.stringify(jobs));
+    alert('Job Posted locally (no Firestore)');
+    console.log('Job posted locally');
 }
 
 
@@ -108,14 +142,16 @@ function loadJobs() {
     const container = document.getElementById("jobList");
     container.innerHTML = "";
 
-    db.collection("jobs").where("status", "==", "Approved")
-        .get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                const job = doc.data();
-                const id = doc.id;
+    const database = getDB();
+    if (database) {
+        database.collection("jobs").where("status", "==", "Approved")
+            .get()
+            .then(snapshot => {
+                snapshot.forEach(doc => {
+                    const job = doc.data();
+                    const id = doc.id;
 
-                container.innerHTML += `
+                    container.innerHTML += `
                     <div class="job-card">
                         <h3>${job.title}</h3>
                         <p>Location: ${job.location}</p>
@@ -123,8 +159,24 @@ function loadJobs() {
                         <button onclick="applyJob('${id}', '${job.title}')">Apply</button>
                     </div>
                 `;
-            });
-        });
+                });
+            }).catch(err => console.error('Failed to load jobs from Firestore', err));
+        return;
+    }
+
+    // fallback: localStorage
+    const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    jobs.forEach(job => {
+        if (job.status !== 'Approved') return;
+        container.innerHTML += `
+                    <div class="job-card">
+                        <h3>${job.title}</h3>
+                        <p>Location: ${job.location}</p>
+                        <p>Salary: ₹${job.salary}</p>
+                        <button onclick="applyJob('${job.title}', '${job.title}')">Apply</button>
+                    </div>
+                `;
+    });
 }
 
 
@@ -133,11 +185,24 @@ function loadJobs() {
 function applyJob(jobId, title) {
     const student = localStorage.getItem("loggedInStudent");
 
-    db.collection("applications").add({
-        jobId: jobId,
-        title: title,
-        student: student
-    }).then(() => alert("Applied Successfully!"));
+    const database = getDB();
+    if (database) {
+        database.collection("applications").add({ jobId: jobId, title: title, student: student })
+            .then(() => alert("Applied Successfully!"))
+            .catch(err => {
+                console.error('Failed to apply via Firestore', err);
+                const applications = JSON.parse(localStorage.getItem('applications')) || [];
+                applications.push({ title: title, student });
+                localStorage.setItem('applications', JSON.stringify(applications));
+                alert('Applied locally (no Firestore)');
+            });
+        return;
+    }
+
+    const applications = JSON.parse(localStorage.getItem('applications')) || [];
+    applications.push({ title: title, student });
+    localStorage.setItem('applications', JSON.stringify(applications));
+    alert('Applied Successfully! (offline)');
 }
 
 
@@ -177,12 +242,18 @@ function loadAdminJobs() {
     const container = document.getElementById("adminJobList");
     container.innerHTML = "";
 
-    db.collection("jobs").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            const job = doc.data();
-            const id = doc.id;
+    const database = getDB();
+    if (database) {
+        database.collection("jobs").get().then(snapshot => {
+            if (snapshot.empty) {
+                container.innerHTML = '<p>No jobs posted yet.</p>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const job = doc.data();
+                const id = doc.id;
 
-            container.innerHTML += `
+                container.innerHTML += `
                 <div class="job-card">
                     <h3>${job.title}</h3>
                     <p>Status: ${job.status}</p>
@@ -193,18 +264,58 @@ function loadAdminJobs() {
                     ` : ""}
                 </div>
             `;
-        });
+            });
+        }).catch(err => console.error('Failed to load admin jobs from Firestore', err));
+        return;
+    }
+
+    // fallback: localStorage
+    const jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    if (jobs.length === 0) {
+        container.innerHTML = '<p>No jobs posted yet.</p>';
+        return;
+    }
+    jobs.forEach((job, index) => {
+        container.innerHTML += `
+            <div class="job-card">
+                <h3>${job.title}</h3>
+                <p>Status: ${job.status}</p>
+
+                ${job.status === "Pending" ? `
+                    <button onclick="approveJob(${index})">Approve</button>
+                    <button onclick="rejectJob(${index})" style="background:red;">Reject</button>
+                ` : ""}
+            </div>
+        `;
     });
 }
 
 function approveJob(id) {
-    db.collection("jobs").doc(id).update({ status: "Approved" })
-        .then(() => loadAdminJobs());
+    const database = getDB();
+    if (database) {
+        database.collection('jobs').doc(id).update({ status: 'Approved' }).then(() => loadAdminJobs()).catch(err => console.error('Failed to approve job in Firestore', err));
+        return;
+    }
+    let jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    if (jobs[id]) {
+        jobs[id].status = 'Approved';
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+    }
+    loadAdminJobs();
 }
 
 function rejectJob(id) {
-    db.collection("jobs").doc(id).update({ status: "Rejected" })
-        .then(() => loadAdminJobs());
+    const database = getDB();
+    if (database) {
+        database.collection('jobs').doc(id).update({ status: 'Rejected' }).then(() => loadAdminJobs()).catch(err => console.error('Failed to reject job in Firestore', err));
+        return;
+    }
+    let jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+    if (jobs[id]) {
+        jobs[id].status = 'Rejected';
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+    }
+    loadAdminJobs();
 }
 
 
@@ -215,16 +326,38 @@ function loadAdminApplications() {
     const container = document.getElementById("adminApplicationList");
     container.innerHTML = "";
 
-    db.collection("applications").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            const app = doc.data();
+    const database = getDB();
+    if (database) {
+        database.collection('applications').get().then(snapshot => {
+            if (snapshot.empty) {
+                container.innerHTML = '<p>No applications yet.</p>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const app = doc.data();
 
-            container.innerHTML += `
+                container.innerHTML += `
                 <div class="job-card">
                     <h3>${app.title}</h3>
                     <p>Applied By: ${app.student}</p>
                 </div>
             `;
-        });
+            });
+        }).catch(err => console.error('Failed to load applications from Firestore', err));
+        return;
+    }
+
+    const applications = JSON.parse(localStorage.getItem('applications')) || [];
+    if (applications.length === 0) {
+        container.innerHTML = '<p>No applications yet.</p>';
+        return;
+    }
+    applications.forEach(app => {
+        container.innerHTML += `
+            <div class="job-card">
+                <h3>${app.title}</h3>
+                <p>Applied By: ${app.student}</p>
+            </div>
+        `;
     });
 }

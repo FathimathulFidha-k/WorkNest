@@ -10,17 +10,23 @@
     <div class="card">
         <h1>Student Login</h1>
 
-        <input type="text" id="username" placeholder="Enter your name">
-        <input type="password" id="password" placeholder="Enter password">
+        <input type="text" id="username" placeholder="Enter Username">
+        <input type="password" id="password" placeholder="Enter Password">
 
+        <button onclick="signupStudent()">Sign Up</button>
         <button onclick="loginStudent()">Login</button>
-    <button onclick="signupStudent()">Sign Up</button>
         <button onclick="location.href='index.html'">Back</button>
     </div>
 </div>
+
+<!-- firebase config generated from .env (optional) -->
+<script src="firebase-config.js"></script>
+<!-- 🔥 FIREBASE CDN (REQUIRED) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
 <script src="script.js"></script>
+
 </body>
 </html>
