@@ -1,35 +1,48 @@
-// ================= FIREBASE CONFIG (from .env -> firebase-config.js) =================
-// If you run `node scripts/generate-config.js` it will read your local .env and
-// write firebase-config.js which defines window.__FIREBASE_CONFIG__.
-// This file prefers the injected config; it falls back to a placeholder config.
+// ================= FIREBASE CONFIG (from .env via firebase-config.js) =================
+// Credentials loaded from firebase-config.js which is generated from .env
+
+// Fallback config (used if firebase-config.js is not found)
 const fallbackFirebaseConfig = {
-  apiKey: vars.FIREBASE_API_KEY || '',
-  authDomain: vars.FIREBASE_AUTH_DOMAIN || '',
-  projectId: vars.FIREBASE_PROJECT_ID || '',
-  storageBucket: vars.FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: vars.FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: vars.FIREBASE_APP_ID || '',
-  measurementId: vars.FIREBASE_MEASUREMENT_ID || ''
+  apiKey: "AIzaSyBLAmdPShLmSdy0vmBpiPh4OGKymD_QpGA",
+  authDomain: "worknest-8da58.firebaseapp.com",
+  projectId: "worknest-8da58",
+  storageBucket: "worknest-8da58.appspot.com",
+  messagingSenderId: "673928983491",
+  appId: "1:673928983491:web:ddcd8252f16e9dfb850376",
+  measurementId: "G-93R6G0VJJ0"
 };
 
+// Use config from firebase-config.js if available, otherwise use fallback
+const firebaseConfig = (typeof window !== 'undefined' && window.__FIREBASE_CONFIG__) 
+  ? window.__FIREBASE_CONFIG__ 
+  : fallbackFirebaseConfig;
 
-const firebaseConfig = (typeof window !== 'undefined' && window.__FIREBASE_CONFIG__) ? window.__FIREBASE_CONFIG__ : fallbackFirebaseConfig;
-
-if (typeof firebase === 'undefined') {
-    console.warn('Firebase SDK not found on page. Make sure you include Firebase SDK scripts in your HTML (or use the compat bundles).');
-} else {
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // expose for other functions in this file that expect `auth` and `db`
-    window.__FIREBASE_AUTH__ = auth;
-    window.__FIREBASE_DB__ = db;
+// Initialize Firebase
+if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        window.__FIREBASE_AUTH__ = firebase.auth();
+        window.__FIREBASE_DB__ = firebase.firestore();
+        console.log('✓ Firebase initialized successfully');
+    } catch (error) {
+        console.warn('Firebase initialization warning:', error.message);
+    }
+} else if (typeof firebase === 'undefined') {
+    console.warn('⚠️ Firebase SDK not found. Make sure Firebase SDK scripts are included in your HTML.');
 }
 
-// Helper accessors that other functions below use (fall back to window vars)
-function getAuth() { return (typeof window !== 'undefined' && window.__FIREBASE_AUTH__) ? window.__FIREBASE_AUTH__ : (typeof firebase !== 'undefined' ? firebase.auth() : null); }
-function getDB() { return (typeof window !== 'undefined' && window.__FIREBASE_DB__) ? window.__FIREBASE_DB__ : (typeof firebase !== 'undefined' ? firebase.firestore() : null); }
+// Helper accessors for other functions
+function getAuth() { 
+    return (typeof window !== 'undefined' && window.__FIREBASE_AUTH__) 
+        ? window.__FIREBASE_AUTH__ 
+        : null;
+}
+
+function getDB() { 
+    return (typeof window !== 'undefined' && window.__FIREBASE_DB__) 
+        ? window.__FIREBASE_DB__ 
+        : null;
+}
 
 
 // ================= STUDENT LOGIN =================
